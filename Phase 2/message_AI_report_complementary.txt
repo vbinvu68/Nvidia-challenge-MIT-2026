@@ -1,0 +1,35 @@
+# AI-Agent Collaborative Development Report: iQuHack 2026 
+
+## 1. The Workflow: Systematic Agent Orchestration
+We adopted a structured **"Architect-Pilot"** framework to manage the complexity of migrating quantum simulations from local environments to high-performance GPU clusters.
+
+* **Infrastructure Architect (Gemini):** Acted as the Lead DevOps consultant. Gemini designed a robust **WSL2-to-Cloud GPU pipeline**, configuring secure SSH tunnels via Brev CLI and managing environment-specific library paths to ensure seamless hardware migration from local CPU testing to remote **NVIDIA L40S** execution.
+* **Implementation Pilot (GitHub Copilot):** Functioned as a real-time coding assistant within the VS Code Remote-SSH environment. It was specifically tasked with implementing the Trotterized circuits and the classical MTS (Metropolis-TS) algorithm, optimizing CUDA-Q kernels for the L40S architecture.
+
+## 2. Verification Strategy: Multi-Tiered Validation
+To preempt AI hallucinations and ensure the physical accuracy of the quantum results, we implemented a **Systemic Verification Layer**:
+
+* **Cross-Platform Consistency Checks:** Established a baseline using small-scale NPP instances ($N=7$). We programmatically compared results from the CPU-based `qpp` target (e.g., verifying Best Energy $\le 3.0$) with initial GPU runs to ensure that the transition to the `nvidia` target did not introduce numerical instability or logic drift.
+* **Interaction Cardinality Audit:** For large-scale problems ($N \ge 100$), we developed a dedicated unit test to verify the **Interaction Index Generation**. This test ensured that the number of 2-body and 4-body interactions ($G2, G4$) generated matched the combinatorial expectations derived from Eq. 15 (e.g., 2,450 for $N=100$), preventing silent logic errors in the graph topology.
+
+## 3. The "Vibe" Log
+
+### 🏆 Win: Accelerated Environment Provisioning
+AI agents saved approximately 4 hours by diagnosing a **Non-Standard Library Path conflict**. When the Brev CLI installation hit a 404 redirect due to a repository migration, the AI provided an immediate binary-level workaround, allowing us to pivot from local debugging to $N=40$ GPU simulations in under 15 minutes.
+
+### 📘 Learn: Context-Specific Skill-Grafting
+We learned that AI performance improves significantly when provided with **"Hardware-Aware Context."** By explicitly injecting hardware specs (NVIDIA L40S, CUDA 12.x) into prompts, we transformed the AI from a general assistant into a specialized GPU performance tuner, enabling it to solve complex `LD_LIBRARY_PATH` resolution issues.
+
+### ❌ Fail: The Dynamic Parameter Binding Conflict
+The AI hallucinated a redundant assignment syntax (`shots_count=shots_count = ...`) during a function call, causing a `SyntaxError` that halted batch processing. This highlighted AI's "blind spots" regarding Python's specific keyword argument rules. We resolved this by implementing a **"Human-in-the-loop"** code review policy for all critical batch-processing logic.
+
+## 4. Context Dump: Thoughtful Prompting Examples
+
+### Infrastructure Strategy
+> "Define a manual installation workflow for Brev CLI on an Ubuntu-WSL2 subsystem, bypassing the deprecated install-sh redirect and targeting the linux-amd64 binary directly."
+
+### Runtime Resolution
+> "Diagnose `RuntimeError: Invalid simulator requested: cusvsim_fp32` on an NVIDIA L40S instance. Provide a Python-level environment variable injection to force the resolution of cuQuantum libraries in `/usr/local/lib`."
+
+### Metric Validation
+> "Verify the logic of the `get_interactions_cpu` function for $N=500$ to ensure the loop nesting does not lead to memory overflows beyond the 125GB RAM limit."
